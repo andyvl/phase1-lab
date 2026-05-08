@@ -1,0 +1,22 @@
+[
+  { "name": "Alice Rossi",    "email": "alice@example.com"   },
+  { "name": "Bruno Conti",    "email": "bruno@example.com"   },
+  { "name": "Carla Esposito", "email": "carla@example.com"   },
+  { "name": "Davide Ricci",   "email": "davide@example.com"  },
+  { "name": "Elena Ferrari",  "email": "elena@example.com"   },
+  { "name": "Fabio Greco",    "email": "fabio@example.com"   },
+  { "name": "Giulia Marino",  "email": "giulia@example.com"  },
+  { "name": "Hamid Yilmaz",   "email": "hamid@example.com"   },
+  { "name": "Irene Bruno",    "email": "irene@example.com"   },
+  { "name": "Javier Santos",  "email": "javier@example.com"  },
+  { "name": "Katia Bianchi",  "email": "katia@example.com"   },
+  { "name": "Luca Romano",    "email": "luca@example.com"    },
+  { "name": "Marta Colombo",  "email": "marta@example.com"   },
+  { "name": "Nikos Papadopoulos", "email": "nikos@example.com" },
+  { "name": "Olga Petrov",    "email": "olga@example.com"    },
+  { "name": "Paolo Mancini",  "email": "paolo@example.com"   },
+  { "name": "Qing Li",        "email": "qing@example.com"    },
+  { "name": "Renata Cruz",    "email": "renata@example.com"  },
+  { "name": "Stefan Koch",    "email": "stefan@example.com"  },
+  { "name": "Tina Dupont",    "email": "tina@example.com"    }
+]

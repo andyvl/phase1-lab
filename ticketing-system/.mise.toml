@@ -1,0 +1,10 @@
+[tools]
+java = "zulu-25"    # pins this project to Java 25; run `mise install` once after cloning
+maven = "3.9.15"
+
+[env]
+# Colima: point Testcontainers at the Colima socket (Docker Desktop sets this automatically)
+# Other runtimes: adjust the path or remove this block entirely
+DOCKER_HOST = "unix:///Users/andreas.vlachos/.colima/default/docker.sock"
+# Ryuk (Testcontainers cleanup daemon) can fail with Colima and Rancher Desktop
+TESTCONTAINERS_RYUK_DISABLED = "true"

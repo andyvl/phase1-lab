@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 5s      # poll every 5 s — tight enough to see spike shape
+  evaluation_interval: 5s
+
+scrape_configs:
+  # Quarkus application — JVM + HTTP + Hibernate + Vert.x metrics
+  - job_name: ticketing-system
+    metrics_path: /q/metrics
+    static_configs:
+      - targets:
+          - app:8080       # Docker Compose service name
+
+  # Prometheus self-monitoring (optional but useful)
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090

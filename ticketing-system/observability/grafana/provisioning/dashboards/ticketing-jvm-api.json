@@ -1,0 +1,449 @@
+{
+  "title": "Ticketing System \u2014 JVM & API",
+  "uid": "ticketing-jvm-api",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "HTTP API",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "id": 2,
+      "title": "Request Rate (RPS)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"ticketing-system\"}[15s])) by (uri, method)",
+          "legendFormat": "{{method}} {{uri}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 10
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "HTTP p95 Latency (ms)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 8,
+        "y": 1,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{job=\"ticketing-system\"}[15s])) by (le, uri)) * 1000",
+          "legendFormat": "p95 {{uri}}"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{job=\"ticketing-system\"}[15s])) by (le, uri)) * 1000",
+          "legendFormat": "p99 {{uri}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "fillOpacity": 5
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "HTTP Error Rate",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 16,
+        "y": 1,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"ticketing-system\", outcome=~\"CLIENT_ERROR|SERVER_ERROR\"}[15s])) by (uri, status)",
+          "legendFormat": "{{status}} {{uri}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "row",
+      "title": "JVM Memory",
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "id": 5,
+      "title": "Heap Used / Committed / Max",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{job=\"ticketing-system\", area=\"heap\"}",
+          "legendFormat": "Used \u2014 {{id}}"
+        },
+        {
+          "expr": "jvm_memory_committed_bytes{job=\"ticketing-system\", area=\"heap\"}",
+          "legendFormat": "Committed \u2014 {{id}}"
+        },
+        {
+          "expr": "jvm_memory_max_bytes{job=\"ticketing-system\", area=\"heap\"}",
+          "legendFormat": "Max \u2014 {{id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "fillOpacity": 8
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Non-Heap Memory Used",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 10,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "jvm_memory_used_bytes{job=\"ticketing-system\", area=\"nonheap\"}",
+          "legendFormat": "{{id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": "row",
+      "title": "JVM Threads & GC",
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "id": 7,
+      "title": "JVM Threads",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "jvm_threads_live_threads{job=\"ticketing-system\"}",
+          "legendFormat": "Live"
+        },
+        {
+          "expr": "jvm_threads_daemon_threads{job=\"ticketing-system\"}",
+          "legendFormat": "Daemon"
+        },
+        {
+          "expr": "jvm_threads_peak_threads{job=\"ticketing-system\"}",
+          "legendFormat": "Peak"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "ZGC Concurrent Phase Time (avg, ms)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 8,
+        "y": 19,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "rate(jvm_gc_concurrent_phase_time_seconds_sum{job=\"ticketing-system\"}[30s]) / rate(jvm_gc_concurrent_phase_time_seconds_count{job=\"ticketing-system\"}[30s]) * 1000",
+          "legendFormat": "avg {{gc}} / {{cause}}"
+        },
+        {
+          "expr": "jvm_gc_concurrent_phase_time_seconds_max{job=\"ticketing-system\"} * 1000",
+          "legendFormat": "max {{gc}} / {{cause}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        }
+      },
+      "description": "Average duration of each ZGC concurrent GC cycle. ZGC is fully concurrent \u2014 no stop-the-world pauses. Uses jvm_gc_concurrent_phase_time_seconds summary."
+    },
+    {
+      "id": 9,
+      "title": "GC Collections / s",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 16,
+        "y": 19,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(jvm_gc_pause_seconds_count{job=\"ticketing-system\"}[30s])) by (action, cause)",
+          "legendFormat": "{{action}} / {{cause}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "Vert.x Event Loop",
+      "gridPos": {
+        "x": 0,
+        "y": 26,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "id": 13,
+      "title": "Reactive SQL Pool",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "sql_pool_active{job=\"ticketing-system\"}",
+          "legendFormat": "active connections"
+        },
+        {
+          "expr": "sql_pool_idle{job=\"ticketing-system\"}",
+          "legendFormat": "idle connections"
+        },
+        {
+          "expr": "sql_pool_queue_size{job=\"ticketing-system\"}",
+          "legendFormat": "queue size (pending)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 200
+              }
+            ]
+          }
+        }
+      },
+      "description": "Vert.x reactive PostgreSQL connection pool state. Queue size > 0 indicates pool pressure; active = connections in use."
+    },
+    {
+      "id": 14,
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 27,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "process_cpu_usage{job=\"ticketing-system\"}",
+          "legendFormat": "Process CPU"
+        },
+        {
+          "expr": "system_cpu_usage{job=\"ticketing-system\"}",
+          "legendFormat": "System CPU"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "row",
+      "title": "Generational ZGC (production only)",
+      "gridPos": {
+        "x": 0,
+        "y": 34,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false
+    },
+    {
+      "id": 16,
+      "title": "ZGC Cycle Duration (avg & max, ms)",
+      "description": "ZGC is a fully concurrent collector \u2014 there are no stop-the-world pauses. This shows average and maximum cycle duration per cause.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 35,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "rate(jvm_gc_concurrent_phase_time_seconds_sum{job=\"ticketing-system\"}[60s]) / rate(jvm_gc_concurrent_phase_time_seconds_count{job=\"ticketing-system\"}[60s]) * 1000",
+          "legendFormat": "avg {{gc}} / {{cause}}"
+        },
+        {
+          "expr": "jvm_gc_concurrent_phase_time_seconds_max{job=\"ticketing-system\"} * 1000",
+          "legendFormat": "max {{gc}} / {{cause}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 17,
+      "title": "Heap After GC vs Max (ZGC live-set)",
+      "description": "jvm_memory_usage_after_gc: fraction of heap occupied by live objects after the last collection. ZGC target is to keep this low.",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 35,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "jvm_memory_usage_after_gc{job=\"ticketing-system\"}",
+          "legendFormat": "Live-set fraction \u2014 {{pool}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.6
+              },
+              {
+                "color": "red",
+                "value": 0.85
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
