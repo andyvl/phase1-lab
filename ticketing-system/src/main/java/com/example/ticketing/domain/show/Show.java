@@ -50,7 +50,7 @@ public final class Show extends AggregateRoot {
             throw new IllegalStateException("Can only open a scheduled show");
         }
         this.status = new ShowStatus.Open();
-        registerEvent(ShowOpened.of(this.id.value()));
+        registerEvent(ShowOpened.of(this.id));
     }
 
     public void cancel(String reason) {

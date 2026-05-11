@@ -2,19 +2,19 @@ package com.example.ticketing.domain.booking;
 
 import com.example.ticketing.domain.shared.Money;
 import com.example.ticketing.domain.show.ShowSeat;
+import com.example.ticketing.domain.show.ShowSeatId;
 import com.example.ticketing.domain.venue.SeatNumber;
 import com.example.ticketing.domain.venue.SeatRow;
-import java.util.UUID;
 
 public final class BookingLine {
-    private final UUID id;
+    private final BookingLineId id;
     private final BookingId bookingId;
-    private final UUID showSeatId;
+    private final ShowSeatId showSeatId;
     private final SeatRow row;
     private final SeatNumber number;
     private final Money price;
 
-    private BookingLine(UUID id, BookingId bookingId, UUID showSeatId, SeatRow row, SeatNumber number, Money price) {
+    private BookingLine(BookingLineId id, BookingId bookingId, ShowSeatId showSeatId, SeatRow row, SeatNumber number, Money price) {
         this.id = id;
         this.bookingId = bookingId;
         this.showSeatId = showSeatId;
@@ -24,10 +24,15 @@ public final class BookingLine {
     }
 
     public static BookingLine create(BookingId bookingId, ShowSeat seat, Money price) {
-        return new BookingLine(UUID.randomUUID(), bookingId, seat.id().value(), seat.row(), seat.number(), price);
+        return new BookingLine(BookingLineId.generate(), bookingId, seat.id(), seat.row(), seat.number(), price);
     }
 
-    public UUID id() {
+    public static BookingLine restore(BookingLineId id, BookingId bookingId, ShowSeatId showSeatId,
+                                      SeatRow row, SeatNumber number, Money price) {
+        return new BookingLine(id, bookingId, showSeatId, row, number, price);
+    }
+
+    public BookingLineId id() {
         return id;
     }
 
@@ -35,7 +40,7 @@ public final class BookingLine {
         return bookingId;
     }
 
-    public UUID showSeatId() {
+    public ShowSeatId showSeatId() {
         return showSeatId;
     }
 

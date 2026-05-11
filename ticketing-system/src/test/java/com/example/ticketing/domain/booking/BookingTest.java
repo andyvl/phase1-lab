@@ -10,14 +10,13 @@ import com.example.ticketing.domain.venue.SeatNumber;
 import com.example.ticketing.domain.venue.SeatRow;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class BookingTest {
     @Test
     void create_withValidSeats_calculatesTotal() {
         var booking = Booking.create(
-            UUID.randomUUID(),
+            ShowId.generate(),
             new Customer("Ada Lovelace", "ada@example.com"),
             List.of(showSeat(1), showSeat(2)),
             Money.of(new BigDecimal("30.00"), "EUR"));
@@ -31,7 +30,7 @@ class BookingTest {
     @Test
     void cancel_updatesStatus() {
         var booking = Booking.create(
-            UUID.randomUUID(),
+            ShowId.generate(),
             new Customer("Ada Lovelace", "ada@example.com"),
             List.of(showSeat(1)),
             Money.of(new BigDecimal("30.00"), "EUR"));
@@ -43,7 +42,7 @@ class BookingTest {
 
     @Test
     void bookingResult_sealedVariants_exhaustiveSwitch() {
-        BookingResult result = new BookingResult.ShowNotBookable(UUID.randomUUID(), "Show is currently CLOSED");
+        BookingResult result = new BookingResult.ShowNotBookable(ShowId.generate(), "Show is currently CLOSED");
 
         var code = switch (result) {
             case BookingResult.Success ignored -> "SUCCESS";

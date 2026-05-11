@@ -11,6 +11,7 @@ public abstract class AggregateRoot {
     }
 
     public List<DomainEvent> pullDomainEvents() {
+
         var events = List.copyOf(domainEvents);
         domainEvents.clear();
         return events;

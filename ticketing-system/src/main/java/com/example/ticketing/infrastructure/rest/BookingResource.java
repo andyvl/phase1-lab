@@ -34,12 +34,12 @@ public class BookingResource {
                 case BookingResult.SeatUnavailable u ->
                     Response.status(Response.Status.CONFLICT)
                         .entity(new ProblemDetail("Seat unavailable",
-                            "Seat %s for show %s is not available".formatted(u.seatId(), u.showId())))
+                            "Seat %s for show %s is not available".formatted(u.seatId(), u.showId().value())))
                         .build();
                 case BookingResult.ShowNotFound nf ->
                     Response.status(Response.Status.NOT_FOUND)
                         .entity(new ProblemDetail("Show not found",
-                            "Show %s not found".formatted(nf.showId())))
+                            "Show %s not found".formatted(nf.showId().value())))
                         .build();
                 case BookingResult.ShowNotBookable nb ->
                     Response.status(422)
@@ -64,12 +64,12 @@ public class BookingResource {
                 case BookingResult.SeatUnavailable u ->
                     Response.status(Response.Status.CONFLICT)
                         .entity(new ProblemDetail("Seat unavailable",
-                            "Seat %s for show %s is not available".formatted(u.seatId(), u.showId())))
+                            "Seat %s for show %s is not available".formatted(u.seatId(), u.showId().value())))
                         .build();
                 case BookingResult.ShowNotFound nf ->
                     Response.status(Response.Status.NOT_FOUND)
                         .entity(new ProblemDetail("Show not found",
-                            "Show %s not found".formatted(nf.showId())))
+                            "Show %s not found".formatted(nf.showId().value())))
                         .build();
                 case BookingResult.ShowNotBookable nb ->
                     Response.status(422)

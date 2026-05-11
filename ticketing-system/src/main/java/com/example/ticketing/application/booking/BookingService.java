@@ -41,11 +41,11 @@ public class BookingService {
         return ShowEntity.<ShowEntity>findById(cmd.showId())
             .flatMap(show -> {
                 if (show == null) {
-                    return Uni.createFrom().item(new BookingResult.ShowNotFound(cmd.showId()));
+                    return Uni.createFrom().item(new BookingResult.ShowNotFound(new ShowId(cmd.showId())));
                 }
                 if (!"OPEN".equals(show.status)) {
                     return Uni.createFrom().item(
-                        new BookingResult.ShowNotBookable(show.id, "Show is currently " + show.status));
+                        new BookingResult.ShowNotBookable(new ShowId(show.id), "Show is currently " + show.status));
                 }
                 return ShowSeatEntity.findByShowAndSeatIds(cmd.showId(), cmd.seatIds())
                     .flatMap(showSeats -> attemptBooking(cmd, show, showSeats));
@@ -104,17 +104,17 @@ public class BookingService {
             var foundIds = showSeats.stream().map(s -> s.seatId).collect(Collectors.toSet());
             var missing = requestedIds.stream().filter(id -> !foundIds.contains(id))
                 .findFirst().orElse(cmd.seatIds().getFirst());
-            return Uni.createFrom().item(new BookingResult.SeatUnavailable(cmd.showId(), missing));
+            return Uni.createFrom().item(new BookingResult.SeatUnavailable(new ShowId(cmd.showId()), missing));
         }
         for (var seat : showSeats) {
             if (!ShowSeatStatus.AVAILABLE.name().equals(seat.status)) {
-                return Uni.createFrom().item(new BookingResult.SeatUnavailable(cmd.showId(), seat.seatId));
+                return Uni.createFrom().item(new BookingResult.SeatUnavailable(new ShowId(cmd.showId()), seat.seatId));
             }
         }
 
         var customer = new Customer(cmd.customerName(), cmd.customerEmail());
         var booking = Booking.create(
-            show.id, customer,
+            new ShowId(show.id), customer,
             showSeats.stream().map(this::toDomainSeat).toList(),
             new Money(show.ticketPriceAmount, show.ticketPriceCurrency));
 
@@ -127,7 +127,7 @@ public class BookingService {
         var bookingEntity = new BookingEntity();
         bookingEntity.id = booking.id().value();
         bookingEntity.customerId = booking.customerId().value();
-        bookingEntity.showId = booking.showId();
+        bookingEntity.showId = booking.showId().value();
         bookingEntity.status = booking.status().name();
         bookingEntity.totalAmount = booking.totalAmount().amount();
         bookingEntity.totalCurrency = booking.totalAmount().currency();
@@ -161,9 +161,9 @@ public class BookingService {
 
     private BookingLineEntity toLineEntity(BookingLine line) {
         var e = new BookingLineEntity();
-        e.id = line.id();
+        e.id = line.id().value();
         e.bookingId = line.bookingId().value();
-        e.showSeatId = line.showSeatId();
+        e.showSeatId = line.showSeatId().value();
         e.rowLabel = line.row().label();
         e.seatNumber = line.number().number();
         e.priceAmount = line.price().amount();

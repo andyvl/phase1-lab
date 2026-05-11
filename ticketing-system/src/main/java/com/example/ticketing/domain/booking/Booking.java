@@ -2,18 +2,18 @@ package com.example.ticketing.domain.booking;
 
 import com.example.ticketing.domain.shared.AggregateRoot;
 import com.example.ticketing.domain.shared.Money;
+import com.example.ticketing.domain.show.ShowId;
 import com.example.ticketing.domain.show.ShowSeat;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public final class Booking extends AggregateRoot {
     private BookingId id;
     private CustomerId customerId;
     private Customer customer;
-    private UUID showId;
+    private ShowId showId;
     private BookingStatus status;
     private List<BookingLine> lines;
     private Instant createdAt;
@@ -21,7 +21,7 @@ public final class Booking extends AggregateRoot {
     private Booking() {
     }
 
-    public static Booking create(UUID showId, Customer customer, List<ShowSeat> seats, Money pricePerSeat) {
+    public static Booking create(ShowId showId, Customer customer, List<ShowSeat> seats, Money pricePerSeat) {
         Objects.requireNonNull(showId, "showId is required");
         Objects.requireNonNull(customer, "customer is required");
         Objects.requireNonNull(seats, "seats are required");
@@ -39,11 +39,11 @@ public final class Booking extends AggregateRoot {
         booking.lines = seats.stream()
             .map(seat -> BookingLine.create(booking.id, seat, pricePerSeat))
             .toList();
-        booking.registerEvent(BookingCreated.of(booking.id.value(), booking.customerId.value()));
+        booking.registerEvent(BookingCreated.of(booking.id, booking.customerId));
         return booking;
     }
 
-    public static Booking restore(BookingId id, CustomerId customerId, Customer customer, UUID showId, BookingStatus status,
+    public static Booking restore(BookingId id, CustomerId customerId, Customer customer, ShowId showId, BookingStatus status,
                                   List<BookingLine> lines, Instant createdAt) {
         var booking = new Booking();
         booking.id = id;
@@ -61,7 +61,7 @@ public final class Booking extends AggregateRoot {
             return;
         }
         this.status = BookingStatus.CANCELLED;
-        registerEvent(BookingCancelled.of(this.id.value(), this.customerId.value()));
+        registerEvent(BookingCancelled.of(this.id, this.customerId));
     }
 
     public Money totalAmount() {
@@ -82,7 +82,7 @@ public final class Booking extends AggregateRoot {
         return customer;
     }
 
-    public UUID showId() {
+    public ShowId showId() {
         return showId;
     }
 
