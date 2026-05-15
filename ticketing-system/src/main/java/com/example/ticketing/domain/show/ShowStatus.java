@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = ShowStatus.SoldOut.class, name = "SOLD_OUT"),
     @JsonSubTypes.Type(value = ShowStatus.Cancelled.class, name = "CANCELLED")
 })
-public sealed interface ShowStatus permits ShowStatus.Scheduled, ShowStatus.Open, ShowStatus.SoldOut, ShowStatus.Cancelled {
+public sealed interface ShowStatus /*permits ShowStatus.Scheduled, ShowStatus.Open, ShowStatus.SoldOut, ShowStatus.Cancelled*/ {
     record Scheduled() implements ShowStatus {
     }
 

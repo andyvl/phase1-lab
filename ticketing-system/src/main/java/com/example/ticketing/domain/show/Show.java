@@ -3,7 +3,11 @@ package com.example.ticketing.domain.show;
 import com.example.ticketing.domain.shared.AggregateRoot;
 import com.example.ticketing.domain.shared.Money;
 import com.example.ticketing.domain.venue.VenueId;
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
 
 public final class Show extends AggregateRoot {
     private ShowId id;
@@ -63,6 +67,33 @@ public final class Show extends AggregateRoot {
 
     public boolean isOpen() {
         return status instanceof ShowStatus.Open;
+    }
+
+    /**
+     * Validates that this show can accept a booking for the given seats and marks them as booked.
+     * Throws {@link ShowNotBookableException} if the show is not open, or
+     * {@link SeatUnavailableException} if any seat is not available.
+     */
+    public void book(List<ShowSeat> seats) {
+        Objects.requireNonNull(seats, "seats are required");
+        if (!(status instanceof ShowStatus.Open)) {
+            throw new ShowNotBookableException(id, "Show is currently " + statusName());
+        }
+        for (var seat : seats) {
+            if (!seat.isAvailable()) {
+                throw new SeatUnavailableException(id, seat.seatId().value());
+            }
+        }
+        seats.forEach(ShowSeat::book);
+    }
+
+    private String statusName() {
+        return switch (status) {
+            case ShowStatus.Scheduled ignored -> "SCHEDULED";
+            case ShowStatus.Open ignored -> "OPEN";
+            case ShowStatus.SoldOut ignored -> "SOLD_OUT";
+            case ShowStatus.Cancelled ignored -> "CANCELLED";
+        };
     }
 
     public ShowId id() {

@@ -31,6 +31,17 @@ public final class ShowSeat {
         return new ShowSeat(id, showId, seatId, row, number, status, version);
     }
 
+    public boolean isAvailable() {
+        return status == ShowSeatStatus.AVAILABLE;
+    }
+
+    public void book() {
+        if (status != ShowSeatStatus.AVAILABLE) {
+            throw new IllegalStateException("Seat is not available");
+        }
+        this.status = ShowSeatStatus.BOOKED;
+    }
+
     public void reserve() {
         if (status != ShowSeatStatus.AVAILABLE) {
             throw new IllegalStateException("Seat is not available");
